@@ -1,5 +1,5 @@
 #!/usr/bin/groovy
-@Library('github.com/hrishin/fabric8-pipeline-library@file-fix')_
+@Library('github.com/hrishin/fabric8-pipeline-library@nodej')_
 
 osio {
     ci {
