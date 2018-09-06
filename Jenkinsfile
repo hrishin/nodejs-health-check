@@ -1,5 +1,5 @@
 #!/usr/bin/groovy
-@Library('github.com/sthaha/fabric8-pipeline-library@nodejs')_
+@Library('github.com/hrishin/fabric8-pipeline-library@scm')_
 
 osio {
     ci {
