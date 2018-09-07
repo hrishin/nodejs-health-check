@@ -3,7 +3,7 @@
 
 osio {
     ci {
-        app = processTemplate(release_version: "1.0.${env.BUILD_NUMBER}")
+        app = processTemplate(release_version: "1.0.${env.BUILD_NUMBER}", yamlFile = "./application.yaml")
         build app: app
     }
 
