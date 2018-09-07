@@ -3,13 +3,13 @@
 
 osio {
     ci {
-        app = processTemplate(release_version: "1.0.${env.BUILD_NUMBER}", yamlFile = "application.yaml")
+        app = processTemplate([release_version: "1.0.${env.BUILD_NUMBER}"], yamlFile = "application.yaml")
         build app: app
     }
 
     cd {
-        app = processTemplate(release_version: "1.0.${env.BUILD_NUMBER}", yamlFile = "application.yaml")
-        build app: app, container: [image: "piyushgarg/testnode", version: "latest"]
+        app = processTemplate(params: [release_version: "1.0.${env.BUILD_NUMBER}"], yamlFile = "application.yaml")
+        build app: app
         deploy app: app, env: 'stage'
         deploy app: app, env: 'run', approval: "manual"
     }
