@@ -1,16 +1,39 @@
 #!/usr/bin/groovy
-@Library('github.com/hrishin/fabric8-pipeline-library@nodejs')_
+@Library('github.com/sthaha/osio-pipeline@develop')_
 
 osio {
+    config runtime: 'node'
+
     ci {
-        app = processTemplate([release_version: "1.0.${env.BUILD_NUMBER}"], yamlFile = "application.yaml")
+        def app = processTemplate()
         build app: app
     }
 
     cd {
-        app = processTemplate(params: [release_version: "1.0.${env.BUILD_NUMBER}"], yamlFile = "application.yaml")
-        build app: app
-        deploy app: app, env: 'stage'
-        deploy app: app, env: 'run', approval: "manual"
+      def resources = processTemplate(params: [
+        release_version: "1.0.${env.BUILD_NUMBER}"
+      ])
+
+      echo "-------------- build default ----------------------------"
+      build resources: resources
+      echo "-------------- build separate ----------------------------"
+      build resources: [
+        [ BuildConfig: resources.BuildConfig],
+        [ImageStream: resources.ImageStream],
+      ]
+
+      // echo "-------------- build commands ---------------------------"
+      // // test passing in commands
+      // build app: app, commands: """
+      //   npm version
+      //   oc version
+      // """
+
+      echo "-------------- deploy -----------------------------------"
+      deploy resources: resources, env: 'stage'
+
+      // deploy app: app, env: 'run', approval: 'manual'
+      echo "---------------------------------------------------------"
     }
 }
+
