@@ -1,5 +1,5 @@
 #!/usr/bin/groovy
-@Library('github.com/sthaha/osio-pipeline@develop')_
+@Library('github.com/sthaha/osio-pipeline@master')_
 
 osio {
     config runtime: 'node'
