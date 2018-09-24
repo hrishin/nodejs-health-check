@@ -108,7 +108,7 @@ objects:
                 periodSeconds: 3
                 successThreshold: 1
                 timeoutSeconds: 1
-              image: "nodejs-health-check${SUFFIX_NAME}"
+              image: ""
               name: nodejs-health-check
               securityContext:
                 privileged: false
