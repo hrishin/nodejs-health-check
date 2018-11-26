@@ -18,6 +18,9 @@ parameters:
     displayName: Source Branch
     value: master
     required: true
+  - name: RELEASE_VERSION
+    description: A release version
+    displayName: Suffix name
   - name: IGNORE_PARAM
     description: The ignorence
     displayName: some name
@@ -55,7 +58,7 @@ objects:
       output:
         to:
           kind: ImageStreamTag
-          name: 'nodejs-health-check${SUFFIX_NAME}'
+          name: 'nodejs-health-check${SUFFIX_NAME}:${RELEASE_VERSION}'
       triggers: []
     status:
       lastVersion: 0
