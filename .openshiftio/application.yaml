@@ -21,6 +21,10 @@ parameters:
     displayName: Source Branch
     value: master
     required: true
+  - name: IGNORE_PARAM
+    description: The ignorence
+    displayName: some name
+    value: "test"
 objects:
   - apiVersion: image.openshift.io/v1
     kind: ImageStream
@@ -53,7 +57,7 @@ objects:
       output:
         to:
           kind: ImageStreamTag
-          name: 'nodejs-health-check${SUFFIX_NAME}:${RELEASE_VERSION}'
+          name: 'nodejs-health-check${SUFFIX_NAME}'
       triggers: []
     status:
       lastVersion: 0
@@ -137,7 +141,7 @@ objects:
               - nodejs-health-check
             from:
               kind: ImageStreamTag
-              name: "nodejs-health-check${SUFFIX_NAME}:${RELEASE_VERSION}"
+              name: "nodejs-health-check${SUFFIX_NAME}"
   - apiVersion: v1
     kind: Route
     metadata:
