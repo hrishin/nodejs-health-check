@@ -49,11 +49,7 @@ objects:
             #ref: '${SOURCE_REPOSITORY_REF}'
         type: Git
       strategy:
-        type: Source
-        sourceStrategy:
-          from:
-            kind: DockerImage
-            name: 'bucharestgold/centos7-s2i-nodejs:10.x'
+        dockerStrategy:
           incremental: true
       output:
         to:
