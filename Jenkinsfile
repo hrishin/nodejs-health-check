@@ -1,39 +1,29 @@
-#!/usr/bin/groovy
-@Library('github.com/sthaha/osio-pipeline@master')_
+@Library('github.com/fabric8io/osio-pipeline@master') _
 
 osio {
-    config runtime: 'node'
 
-    ci {
-        def app = processTemplate()
-        build app: app
-    }
+  config runtime: 'node'
 
-    cd {
-      def resources = processTemplate(params: [
+  ci {
+    // runs oc process
+    def resources = processTemplate()
+
+    // performs an s2i build
+    build resources: resources
+
+  }
+
+  cd {
+
+    // override the RELEASE_VERSION template parameter
+    def resources = processTemplate(params: [
         RELEASE_VERSION: "1.0.${env.BUILD_NUMBER}"
-      ])
+    ])
 
-      echo "-------------- build default ----------------------------"
-      build resources: resources
-      echo "-------------- build separate ----------------------------"
-      build resources: [
-        [ BuildConfig: resources.BuildConfig],
-        [ImageStream: resources.ImageStream],
-      ]
+    build resources: resources
+    deploy resources: resources, env: 'stage'
 
-      // echo "-------------- build commands ---------------------------"
-      // // test passing in commands
-      // build app: app, commands: """
-      //   npm version
-      //   oc version
-      // """
-
-      echo "-------------- deploy -----------------------------------"
-      deploy resources: resources, env: 'stage'
-
-      // deploy app: app, env: 'run', approval: 'manual'
-      echo "---------------------------------------------------------"
-    }
+    // wait for user to approve the promotion to "run" environment
+    deploy resources: resources, env: 'run', approval: 'manual'
+  }
 }
-
