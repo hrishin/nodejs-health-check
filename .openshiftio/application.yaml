@@ -9,6 +9,11 @@ parameters:
   - name: SUFFIX_NAME
     description: The suffix name for the template objects
     displayName: Suffix name
+    value: ''
+  - name: RELEASE_VERSION
+    description: The release version number of application
+    displayName: Release version
+    value: 2.0.1
   - name: SOURCE_REPOSITORY_URL
     description: The source URL for the application
     displayName: Source URL
@@ -18,44 +23,50 @@ parameters:
     displayName: Source Branch
     value: master
     required: true
-  - name: RELEASE_VERSION
-    description: A release version
-    displayName: Suffix name
-  - name: IGNORE_PARAM
-    description: The ignorence
-    displayName: some name
-    value: "test"
+  - name: GITHUB_WEBHOOK_SECRET
+    description: A secret string used to configure the GitHub webhook.
+    displayName: GitHub Webhook Secret
+    required: true
+    from: '[a-zA-Z0-9]{40}'
+    generate: expression
 objects:
   - apiVersion: image.openshift.io/v1
     kind: ImageStream
     metadata:
-      name: nodejs-health-check${SUFFIX_NAME}
+      name: 'nodejs-health-check${SUFFIX_NAME}'
       labels:
-        version: ${RELEASE_VERSION}
+        version: '${RELEASE_VERSION}'
     spec: {}
   - apiVersion: v1
     kind: BuildConfig
     metadata:
-      name: nodejs-health-check-s2i${SUFFIX_NAME}
+      name: 'nodejs-health-check-s2i${SUFFIX_NAME}'
       labels:
-          version: ${RELEASE_VERSION}
+        version: '${RELEASE_VERSION}'
     spec:
-      postCommit: {}
-      resources: {}
-      source:
-        dockerfile:
-            "FROM centos:7\nRUN yum install -y httpd"
-            #uri: '${SOURCE_REPOSITORY_URL}'
-            #ref: '${SOURCE_REPOSITORY_REF}'
-        type: Git
-      strategy:
-        dockerStrategy:
-          incremental: true
       output:
         to:
           kind: ImageStreamTag
           name: 'nodejs-health-check${SUFFIX_NAME}:${RELEASE_VERSION}'
-      triggers: []
+      postCommit: {}
+      resources: {}
+      source:
+        git:
+          uri: '${SOURCE_REPOSITORY_URL}'
+          ref: '${SOURCE_REPOSITORY_REF}'
+        type: Git
+      strategy:
+        type: Source
+        sourceStrategy:
+          from:
+            kind: DockerImage
+            name: 'nodeshift/centos7-s2i-nodejs:10.x'
+          incremental: true
+      triggers:
+        - github:
+            secret: '${GITHUB_WEBHOOK_SECRET}'
+          type: GitHub
+        - type: ConfigChange
     status:
       lastVersion: 0
   - apiVersion: v1
@@ -70,21 +81,21 @@ objects:
         project: nodejs-health-check
         provider: nodeshift
     metadata:
-      name: nodejs-health-check${SUFFIX_NAME}
+      name: 'nodejs-health-check${SUFFIX_NAME}'
       labels:
         provider: nodeshift
         expose: 'true'
         project: nodejs-health-check
-        version: ${RELEASE_VERSION}
+        version: '${RELEASE_VERSION}'
   - apiVersion: v1
     kind: DeploymentConfig
     metadata:
-      name: nodejs-health-check${SUFFIX_NAME}
+      name: 'nodejs-health-check${SUFFIX_NAME}'
       labels:
         app: nodejs-health-check
         provider: nodeshift
         project: nodejs-health-check
-        version: ${RELEASE_VERSION}
+        version: '${RELEASE_VERSION}'
     spec:
       template:
         spec:
@@ -109,7 +120,7 @@ objects:
                 periodSeconds: 3
                 successThreshold: 1
                 timeoutSeconds: 1
-              image: ""
+              image: ''
               name: nodejs-health-check
               securityContext:
                 privileged: false
@@ -122,9 +133,8 @@ objects:
             app: nodejs-health-check
             project: nodejs-health-check
             provider: nodeshift
-            version: ${RELEASE_VERSION}
+            version: '${RELEASE_VERSION}'
       replicas: 1
-      revisionHistoryLimit: 2
       selector:
         app: nodejs-health-check
         project: nodejs-health-check
@@ -138,18 +148,18 @@ objects:
               - nodejs-health-check
             from:
               kind: ImageStreamTag
-              name: "nodejs-health-check${SUFFIX_NAME}"
+              name: 'nodejs-health-check${SUFFIX_NAME}:${RELEASE_VERSION}'
   - apiVersion: v1
     kind: Route
     metadata:
       labels:
         project: nodejs-health-check
         provider: nodeshift
-        version: ${RELEASE_VERSION}
-      name: nodejs-health-check${SUFFIX_NAME}
+        version: '${RELEASE_VERSION}'
+      name: 'nodejs-health-check${SUFFIX_NAME}'
     spec:
       port:
         targetPort: 8080
       to:
         kind: Service
-        name: nodejs-health-check${SUFFIX_NAME}
+        name: 'nodejs-health-check${SUFFIX_NAME}'
