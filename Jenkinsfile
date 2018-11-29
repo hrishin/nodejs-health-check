@@ -1,4 +1,4 @@
-@Library('github.com/hrishin/osio-pipeline@params-fix') _
+@Library('github.com/hrishin/osio-pipeline@fix-util-ns') _
 
 osio {
 
