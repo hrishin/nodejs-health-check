@@ -1,4 +1,4 @@
-@Library('github.com/hrishin/osio-pipeline@ci-setup') _
+@Library('github.com/hrishin/osio-pipeline@ci-cd-test') _
 
 osio {
 
