@@ -26,3 +26,4 @@ osio {
     // wait for user to approve the promotion to "run" environment
     deploy resources: resources, env: 'run', approval: 'manual'
   }
+}
