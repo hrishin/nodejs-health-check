@@ -1,4 +1,4 @@
-@Library('github.com/hrishin/osio-pipeline@build-ut') _
+@Library('github.com/hrishin/osio-pipeline@master') _
 
 osio {
 
